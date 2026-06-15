@@ -1,0 +1,140 @@
+{% extends "base.html" %}
+{% block title %}{{ scenario.name }} — Cable Resilience Analyzer{% endblock %}
+{% block content %}
+
+<div style="margin-bottom:16px;">
+  <a href="/" style="font-size:12px; color:#64748b;">← Back to Overview</a>
+</div>
+
+<div class="card" style="padding:14px 20px; background:#7f1d1d; color:#fff; border:none;">
+  <div style="display:flex; justify-content:space-between; align-items:center;">
+    <div>
+      <h2 style="color:#fff; border:none; padding:0; margin-bottom:4px;">{{ scenario.name }}</h2>
+      <p style="color:#fca5a5; font-size:12px;">{{ scenario.description }}</p>
+    </div>
+    <div style="text-align:right; flex-shrink:0; margin-left:16px;">
+      {% if scenario.id != 'custom' %}
+      <a href="/scenario/{{ scenario.id }}/report.pdf" class="btn btn-outline" style="color:#fff; border-color:#fff; font-size:12px;">Download PDF</a>
+      {% endif %}
+    </div>
+  </div>
+</div>
+
+<!-- Impact Metrics -->
+<div class="metric-grid" style="margin-bottom:20px;">
+  <div class="metric">
+    <div class="metric-label">Cables cut</div>
+    <div class="metric-value">{{ result.cable_cuts | length }}</div>
+    <div class="metric-sub">{{ result.cable_names | join(", ") }}</div>
+  </div>
+  <div class="metric">
+    <div class="metric-label">Isolated stations</div>
+    <div class="metric-value" style="color:#dc2626;">{{ result.isolated_node_ids | length }}</div>
+    <div class="metric-sub">Stations with zero connectivity</div>
+  </div>
+  <div class="metric">
+    <div class="metric-label">Disconnected pairs</div>
+    <div class="metric-value">{{ result.disconnected_pairs }}</div>
+    <div class="metric-sub">of {{ result.total_pairs }} total ({{ result.percent_pairs_disconnected }}%)</div>
+  </div>
+  <div class="metric">
+    <div class="metric-label">Capacity lost</div>
+    <div class="metric-value">{{ result.lost_capacity_tbps }} Tbps</div>
+    <div class="metric-sub">{{ result.percent_capacity_lost }}% of total network capacity</div>
+  </div>
+  <div class="metric">
+    <div class="metric-label">Fragmentation</div>
+    <div class="metric-value">{{ result.components_before }} → {{ result.components_after }}</div>
+    <div class="metric-sub">Network components</div>
+  </div>
+  {% if result.affected_regions %}
+  <div class="metric">
+    <div class="metric-label">Affected regions</div>
+    <div class="metric-value" style="font-size:0.9rem;">{{ result.affected_regions | join(", ") }}</div>
+    <div class="metric-sub">Regions with isolated stations</div>
+  </div>
+  {% endif %}
+</div>
+
+<!-- Scenario Map -->
+<div class="card">
+  <h2>Failure Scenario Map</h2>
+  <p style="font-size:12px; color:#64748b; margin-bottom:10px;">
+    Red dashed lines = severed cables. Purple stations = isolated (no connectivity).
+  </p>
+  <div class="map-frame">
+    {% if scenario.id != 'custom' %}
+    <iframe src="/scenario/{{ scenario.id }}/map" style="width:100%;height:500px;border:none;" loading="lazy"></iframe>
+    {% else %}
+    <div id="custom-map-wrapper">
+      {{ custom_map_html | safe }}
+    </div>
+    {% endif %}
+  </div>
+</div>
+
+<!-- Summary -->
+<div style="display:grid; grid-template-columns:1fr 1fr; gap:20px;">
+  <div class="card">
+    <h2>Impact Summary</h2>
+    <ul class="summary-list">
+      {% for line in result.summary_lines %}
+      <li>{{ line }}</li>
+      {% endfor %}
+    </ul>
+    {% if result.isolated_node_names %}
+    <div style="margin-top:14px;">
+      <div style="font-size:11px; font-weight:700; color:#64748b; text-transform:uppercase; margin-bottom:6px;">Isolated Landing Stations</div>
+      {% for name in result.isolated_node_names %}
+      <span class="badge badge-CRITICAL" style="margin:2px;">{{ name }}</span>
+      {% endfor %}
+    </div>
+    {% endif %}
+  </div>
+
+  <div class="card">
+    <h2>Scenario Context</h2>
+    <p style="font-size:12px; line-height:1.6; color:#475569; margin-bottom:10px;">
+      <b>Threat Actor:</b> {{ scenario.threat_actor }}
+    </p>
+    <p style="font-size:12px; line-height:1.6; color:#475569;">
+      <b>NUWC / DoD Relevance:</b> {{ scenario.nuwc_relevance }}
+    </p>
+  </div>
+</div>
+
+<!-- Strategic Brief -->
+<div class="card">
+  <h2>Strategic Resilience Brief</h2>
+  {% if demo_mode %}
+  <div style="font-size:11px; color:#64748b; background:#f8fafc; padding:6px 10px; border-radius:4px; margin-bottom:10px;">
+    Pre-baked brief. Set ANTHROPIC_API_KEY to generate live analysis from Claude.
+  </div>
+  {% endif %}
+  <div class="brief">{{ result.brief }}</div>
+</div>
+
+{% if scenario.id != 'custom' %}
+<div style="margin-top:4px; margin-bottom:24px;">
+  <a href="/scenario/{{ scenario.id }}/report.pdf" class="btn btn-primary">Download PDF Report →</a>
+</div>
+{% endif %}
+
+{% if scenario.id == 'custom' %}
+<!-- For custom map, we rendered the full Folium HTML inside a div, which wraps poorly.
+     Use JavaScript to extract the map element and put it in an iframe. -->
+<script>
+  const wrapper = document.getElementById('custom-map-wrapper');
+  if (wrapper) {
+    const blob = new Blob([wrapper.innerHTML], {type: 'text/html'});
+    const url = URL.createObjectURL(blob);
+    const iframe = document.createElement('iframe');
+    iframe.src = url;
+    iframe.style.cssText = 'width:100%;height:500px;border:none;';
+    wrapper.innerHTML = '';
+    wrapper.appendChild(iframe);
+  }
+</script>
+{% endif %}
+
+{% endblock %}

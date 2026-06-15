@@ -1,0 +1,15 @@
+services:
+  - type: web
+    name: cable-resilience
+    runtime: python
+    plan: free
+    region: virginia
+    buildCommand: pip install -r requirements.txt
+    startCommand: uvicorn cable_analyzer.main:app --host 0.0.0.0 --port $PORT
+    envVars:
+      - key: PYTHON_VERSION
+        value: "3.11.9"
+      - key: DEMO_MODE
+        value: "True"
+      - key: ANTHROPIC_API_KEY
+        sync: false

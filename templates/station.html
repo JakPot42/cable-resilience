@@ -1,0 +1,122 @@
+{% extends "base.html" %}
+{% block title %}{{ lp.name }} — Landing Station Detail{% endblock %}
+{% block content %}
+
+<div style="margin-bottom:16px;">
+  <a href="/" style="font-size:12px; color:#64748b;">← Back to Overview</a>
+</div>
+
+<div class="card" style="background:#1e3a5f; color:#fff; border:none;">
+  <div style="display:flex; justify-content:space-between; align-items:center;">
+    <div>
+      <h2 style="color:#fff; border:none; padding:0; font-size:1.3rem;">{{ lp.name }}</h2>
+      <p style="color:#93c5fd; font-size:13px;">{{ lp.city }}, {{ lp.country }} · {{ lp.region }}</p>
+    </div>
+    <span class="badge badge-{{ risk.level }}" style="font-size:1rem; padding:6px 16px;">{{ risk.level }}</span>
+  </div>
+</div>
+
+<!-- Metrics -->
+<div class="metric-grid" style="margin-bottom:20px;">
+  <div class="metric">
+    <div class="metric-label">Risk Score</div>
+    <div class="metric-value" style="color:{% if risk.level == 'CRITICAL' %}#dc2626{% elif risk.level == 'HIGH' %}#ea580c{% elif risk.level == 'MEDIUM' %}#ca8a04{% else %}#16a34a{% endif %};">
+      {{ risk.score }}/100
+    </div>
+    <div class="metric-sub">Criticality score</div>
+  </div>
+  <div class="metric">
+    <div class="metric-label">Betweenness Centrality</div>
+    <div class="metric-value">{{ centrality }}</div>
+    <div class="metric-sub">Fraction of global shortest paths</div>
+  </div>
+  <div class="metric">
+    <div class="metric-label">Cables landing</div>
+    <div class="metric-value">{{ cables | length }}</div>
+    <div class="metric-sub">Unique cable systems</div>
+  </div>
+  <div class="metric">
+    <div class="metric-label">Coordinates</div>
+    <div class="metric-value" style="font-size:1rem;">{{ lp.lat }}°, {{ lp.lon }}°</div>
+    <div class="metric-sub">Latitude, Longitude</div>
+  </div>
+</div>
+
+<!-- Score breakdown -->
+<div class="card">
+  <h2>Risk Score Breakdown</h2>
+  {% if risk.components %}
+  <table>
+    <thead>
+      <tr><th>Component</th><th>Score</th><th>Max</th><th>Notes</th></tr>
+    </thead>
+    <tbody>
+      <tr>
+        <td>Betweenness Centrality</td>
+        <td><b>{{ risk.components.centrality }}</b></td>
+        <td>40</td>
+        <td>Fraction of all shortest paths passing through this station</td>
+      </tr>
+      <tr>
+        <td>Cable Count</td>
+        <td><b>{{ risk.components.cable_count }}</b></td>
+        <td>30</td>
+        <td>{{ cables | length }} cable(s) — more cables landing = higher impact if station is attacked</td>
+      </tr>
+      <tr>
+        <td>Jurisdiction Risk</td>
+        <td><b>{{ risk.components.jurisdiction }}</b></td>
+        <td>15</td>
+        <td>{{ lp.country }} jurisdiction risk classification</td>
+      </tr>
+      <tr>
+        <td>Geographic Chokepoint</td>
+        <td><b>{{ risk.components.geography }}</b></td>
+        <td>15</td>
+        <td>Proximity to strategic maritime strait or bottleneck</td>
+      </tr>
+      <tr style="font-weight:bold;">
+        <td>Total</td>
+        <td><b>{{ risk.score }}</b></td>
+        <td>100</td>
+        <td><span class="badge badge-{{ risk.level }}">{{ risk.level }}</span></td>
+      </tr>
+    </tbody>
+  </table>
+  {% endif %}
+</div>
+
+<!-- Cables at this station -->
+<div class="card">
+  <h2>Cables Landing at {{ lp.name }}</h2>
+  {% if cables %}
+  <table>
+    <thead>
+      <tr>
+        <th>Cable Name</th>
+        <th>Capacity</th>
+        <th>Length</th>
+        <th>RFS Year</th>
+        <th>Owners</th>
+        <th>Region</th>
+      </tr>
+    </thead>
+    <tbody>
+      {% for cable in cables %}
+      <tr>
+        <td><b>{{ cable.name }}</b></td>
+        <td>{{ cable.capacity_tbps }} Tbps</td>
+        <td>{{ "{:,}".format(cable.length_km) }} km</td>
+        <td>{{ cable.rfs_year }}</td>
+        <td>{{ cable.owners | join(", ") }}</td>
+        <td>{{ cable.region }}</td>
+      </tr>
+      {% endfor %}
+    </tbody>
+  </table>
+  {% else %}
+  <p style="color:#64748b; font-size:13px;">No cables found for this station.</p>
+  {% endif %}
+</div>
+
+{% endblock %}

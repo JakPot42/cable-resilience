@@ -1,0 +1,68 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>{% block title %}Submarine Cable Resilience Analyzer{% endblock %}</title>
+  <style>
+    *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+    body { font-family: system-ui, -apple-system, sans-serif; background: #f8fafc; color: #1e293b; font-size: 14px; }
+    header { background: #1e3a5f; color: #fff; padding: 12px 24px; display: flex; align-items: center; gap: 20px; }
+    header h1 { font-size: 1.1rem; font-weight: 700; letter-spacing: .02em; }
+    header nav a { color: #93c5fd; text-decoration: none; font-size: 13px; margin-left: 16px; }
+    header nav a:hover { color: #fff; }
+    .demo-banner { background: #fef3c7; border-bottom: 1px solid #fcd34d; color: #92400e; padding: 7px 24px; font-size: 12px; text-align: center; }
+    main { max-width: 1200px; margin: 0 auto; padding: 24px; }
+    .card { background: #fff; border-radius: 8px; border: 1px solid #e2e8f0; padding: 20px; margin-bottom: 20px; }
+    .card h2 { font-size: 1rem; font-weight: 700; color: #1e3a5f; margin-bottom: 12px; border-bottom: 2px solid #e2e8f0; padding-bottom: 8px; }
+    .metric-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(180px, 1fr)); gap: 12px; }
+    .metric { background: #f1f5f9; border-radius: 6px; padding: 14px; }
+    .metric-label { font-size: 11px; color: #64748b; text-transform: uppercase; letter-spacing: .05em; }
+    .metric-value { font-size: 1.5rem; font-weight: 700; color: #1e3a5f; line-height: 1.2; }
+    .metric-sub { font-size: 11px; color: #64748b; }
+    .badge { display: inline-block; padding: 2px 8px; border-radius: 4px; font-size: 11px; font-weight: 700; text-transform: uppercase; }
+    .badge-CRITICAL { background: #fee2e2; color: #dc2626; }
+    .badge-HIGH     { background: #ffedd5; color: #ea580c; }
+    .badge-MEDIUM   { background: #fef9c3; color: #ca8a04; }
+    .badge-LOW      { background: #dcfce7; color: #16a34a; }
+    .btn { display: inline-block; padding: 8px 16px; border-radius: 6px; font-size: 13px; font-weight: 600; cursor: pointer; text-decoration: none; border: none; }
+    .btn-primary { background: #1e3a5f; color: #fff; }
+    .btn-primary:hover { background: #2d5a8e; }
+    .btn-danger { background: #dc2626; color: #fff; }
+    .btn-outline { background: transparent; color: #1e3a5f; border: 1px solid #1e3a5f; }
+    table { width: 100%; border-collapse: collapse; font-size: 13px; }
+    th { background: #f1f5f9; text-align: left; padding: 8px 12px; color: #64748b; font-size: 11px; text-transform: uppercase; }
+    td { padding: 8px 12px; border-top: 1px solid #e2e8f0; }
+    tr:hover td { background: #f8fafc; }
+    a { color: #1e3a5f; }
+    .map-frame { border-radius: 8px; overflow: hidden; border: 1px solid #e2e8f0; }
+    .scenario-card { border: 1px solid #e2e8f0; border-radius: 8px; padding: 16px; }
+    .scenario-card h3 { font-size: 0.95rem; font-weight: 700; margin-bottom: 6px; }
+    .scenario-card p { font-size: 12px; color: #475569; line-height: 1.5; }
+    .scenario-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(280px, 1fr)); gap: 16px; }
+    select, input[type=checkbox] { accent-color: #1e3a5f; }
+    .summary-list { list-style: none; padding: 0; }
+    .summary-list li { padding: 5px 0; border-bottom: 1px solid #f1f5f9; font-size: 13px; }
+    .summary-list li::before { content: "→ "; color: #64748b; }
+    .brief { font-size: 13px; line-height: 1.7; color: #334155; white-space: pre-wrap; }
+  </style>
+</head>
+<body>
+  <header>
+    <h1>🔗 Submarine Cable Resilience Analyzer</h1>
+    <nav>
+      <a href="/">Overview</a>
+      <a href="/map" target="_blank">Global Map</a>
+      <a href="/api/stats">API</a>
+    </nav>
+  </header>
+  {% if demo_mode %}
+  <div class="demo-banner">
+    DEMO MODE — Pre-seeded data only. Set ANTHROPIC_API_KEY for live brief generation.
+  </div>
+  {% endif %}
+  <main>
+    {% block content %}{% endblock %}
+  </main>
+</body>
+</html>
