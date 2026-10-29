@@ -2,7 +2,7 @@
 
 NetworkX graph analysis of global submarine cable infrastructure. Betweenness centrality identifies physical chokepoints in the network that carries 99% of international internet traffic. N-1/N-2 cable cut simulations quantify connectivity and capacity loss. Interactive Folium map with risk heat layer.
 
-**This tool is distinct from [FriendShore](https://github.com/JakPot42/friendshore-supply-chain).** FriendShore traces corporate supply chain relationships — which companies depend on which Tier-2 and Tier-3 suppliers. This tool analyzes physical undersea network topology — which landing stations are chokepoints in the global internet's physical layer, and what happens when specific cables are severed.
+**This tool is distinct from FriendShore.** FriendShore traces corporate supply chain relationships: which companies depend on which Tier-2 and Tier-3 suppliers. This tool analyzes physical undersea network topology: which landing stations are chokepoints in the global internet's physical layer, and what happens when specific cables are severed.
 
 **Live demo:** [cable-resilience.onrender.com](https://cable-resilience.onrender.com)
 
